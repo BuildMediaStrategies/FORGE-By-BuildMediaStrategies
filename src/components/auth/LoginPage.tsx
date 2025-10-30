@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { signInWithRememberMe } from '../../lib/supabase';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -8,34 +8,44 @@ interface LoginPageProps {
 
 export function LoginPage({ }: LoginPageProps) {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !password) return;
 
     setLoading(true);
     setError('');
     setSuccess(false);
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: window.location.origin,
-        },
-      });
+      // Use signInWithRememberMe helper to handle storage based on checkbox
+      // If Remember Me is checked: uses localStorage (persists across browser restarts)
+      // If unchecked: uses sessionStorage (clears when browser closes)
+      const { error } = await signInWithRememberMe(email, password, rememberMe);
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
+      console.log('User signed in successfully:', email, 'Remember Me:', rememberMe);
       setSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'Failed to send magic link. Please try again.');
+      console.error('Login error:', err);
+      const errorMessage = err.message || 'Failed to sign in. Please check your credentials.';
+      setError(errorMessage);
+      alert(`Login Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCreateAccount = () => {
+    console.log('Create account clicked - feature coming soon');
   };
 
   return (
@@ -62,7 +72,7 @@ export function LoginPage({ }: LoginPageProps) {
           <div className="p-6 pt-0">
             {success ? (
               <div className="p-4 bg-[#2d2d2d] border-2 border-green-500 rounded text-sm text-white font-semibold text-center">
-                Check your email for the magic link!
+                Successfully signed in! Redirecting...
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -88,6 +98,36 @@ export function LoginPage({ }: LoginPageProps) {
                   />
                 </div>
 
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium leading-none text-white">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="neumorphic-input flex h-11 w-full px-4 py-2 text-sm font-medium placeholder:text-[#e5e5e5] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="rememberMe"
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    disabled={loading}
+                    className="w-4 h-4 rounded border-[#2d2d2d] bg-[#1a1a1a] text-white focus:ring-2 focus:ring-white disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <label htmlFor="rememberMe" className="text-sm font-medium text-white cursor-pointer">
+                    Remember Me
+                  </label>
+                </div>
+
                 <button
                   type="submit"
                   disabled={loading}
@@ -96,12 +136,23 @@ export function LoginPage({ }: LoginPageProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin inline" />
-                      Sending magic link...
+                      Signing in...
                     </>
                   ) : (
-                    'Send Magic Link'
+                    'Sign In'
                   )}
                 </button>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={handleCreateAccount}
+                    disabled={loading}
+                    className="text-sm text-[#888] hover:text-[#e5e5e5] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Don't have an account? Create one
+                  </button>
+                </div>
               </form>
             )}
           </div>

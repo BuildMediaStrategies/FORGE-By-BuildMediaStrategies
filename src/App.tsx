@@ -7,6 +7,7 @@ import { DrawingsPage } from './components/drawings/DrawingsPage';
 import { GangsPage } from './components/gangs/GangsPage';
 import { AIAssistantPage } from './components/ai/AIAssistantPage';
 import { LoginPage } from './components/auth/LoginPage';
+import { SignupPage } from './components/auth/SignupPage';
 import { supabase } from './lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -20,6 +21,7 @@ function App() {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activePage, setActivePage] = useState('dashboard');
+  const [showSignup, setShowSignup] = useState(false);
 
   useEffect(() => {
     // Check for existing session on mount
@@ -129,9 +131,25 @@ function App() {
     );
   }
 
-  // Show login page if no user is authenticated
+  // Show login/signup page if no user is authenticated
   if (!user) {
-    return <LoginPage onSuccess={handleLoginSuccess} />;
+    if (showSignup) {
+      return (
+        <SignupPage
+          onSuccess={() => {
+            console.log('Signup successful');
+            setShowSignup(false);
+          }}
+          onBackToLogin={() => setShowSignup(false)}
+        />
+      );
+    }
+    return (
+      <LoginPage
+        onSuccess={handleLoginSuccess}
+        onShowSignup={() => setShowSignup(true)}
+      />
+    );
   }
 
   // Show main app once authenticated

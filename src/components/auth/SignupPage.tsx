@@ -1,53 +1,118 @@
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { signInWithRememberMe } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
-interface LoginPageProps {
+interface SignupPageProps {
   onSuccess: () => void;
-  onShowSignup: () => void;
+  onBackToLogin: () => void;
 }
 
-export function LoginPage({ onShowSignup }: LoginPageProps) {
+export function SignupPage({ onSuccess, onBackToLogin }: SignupPageProps) {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const validateForm = (): string | null => {
+    // Check all fields are filled
+    if (!fullName || !email || !password || !confirmPassword) {
+      return 'Please fill in all fields';
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+
+    // Check password length
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+
+    // Check passwords match
+    if (password !== confirmPassword) {
+      return 'Passwords do not match';
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+
+    // Validate form
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setLoading(true);
     setError('');
     setSuccess(false);
 
     try {
-      // Use signInWithRememberMe helper to handle storage based on checkbox
-      // If Remember Me is checked: uses localStorage (persists across browser restarts)
-      // If unchecked: uses sessionStorage (clears when browser closes)
-      const { error } = await signInWithRememberMe(email, password, rememberMe);
+      // Step 1: Create auth user with Supabase
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: fullName,
+          },
+        },
+      });
 
-      if (error) {
-        throw error;
+      if (signUpError) {
+        console.error('Supabase signup error:', signUpError);
+        throw signUpError;
       }
 
-      console.log('User signed in successfully:', email, 'Remember Me:', rememberMe);
+      if (!authData.user) {
+        throw new Error('User creation failed - no user returned');
+      }
+
+      console.log('Auth user created:', authData.user.id);
+
+      // Step 2: Insert into users table
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert({
+          id: authData.user.id,
+          email: email,
+          name: fullName,
+          role: 'Manager',
+        });
+
+      if (insertError) {
+        console.error('Error inserting into users table:', insertError);
+        // Don't throw here - auth user is created, they can still sign in
+        alert(`Warning: User created but profile setup incomplete. Error: ${insertError.message}`);
+      } else {
+        console.log('User profile created successfully');
+      }
+
+      // Step 3: Show success and redirect
       setSuccess(true);
+      console.log('Account created successfully for:', email);
+
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        onBackToLogin();
+      }, 2000);
+
     } catch (err: any) {
-      console.error('Login error:', err);
-      const errorMessage = err.message || 'Failed to sign in. Please check your credentials.';
+      console.error('Signup error:', err);
+      const errorMessage = err.message || 'Failed to create account. Please try again.';
       setError(errorMessage);
-      alert(`Login Error: ${errorMessage}`);
+      alert(`Signup Error: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCreateAccount = () => {
-    console.log('Navigating to signup page');
-    onShowSignup();
   };
 
   return (
@@ -66,15 +131,15 @@ export function LoginPage({ onShowSignup }: LoginPageProps) {
 
         <div className="neumorphic-card border border-[#2d2d2d] shadow-none bg-[#1a1a1a]">
           <div className="space-y-1 pb-6 p-6">
-            <h3 className="text-2xl font-black text-white">Welcome back</h3>
+            <h3 className="text-2xl font-black text-white">Create Account</h3>
             <p className="text-base text-[#e5e5e5] font-medium">
-              Sign in to manage your scaffolding projects
+              Join FORGE to manage your scaffolding projects
             </p>
           </div>
           <div className="p-6 pt-0">
             {success ? (
               <div className="p-4 bg-[#2d2d2d] border-2 border-green-500 rounded text-sm text-white font-semibold text-center">
-                Successfully signed in! Redirecting...
+                Account created! Please sign in.
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
@@ -83,6 +148,22 @@ export function LoginPage({ onShowSignup }: LoginPageProps) {
                     {error}
                   </div>
                 )}
+
+                <div className="space-y-2">
+                  <label htmlFor="fullName" className="text-sm font-medium leading-none text-white">
+                    Full Name
+                  </label>
+                  <input
+                    id="fullName"
+                    type="text"
+                    placeholder="John Smith"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="neumorphic-input flex h-11 w-full px-4 py-2 text-sm font-medium placeholder:text-[#e5e5e5] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                </div>
 
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium leading-none text-white">
@@ -107,7 +188,7 @@ export function LoginPage({ onShowSignup }: LoginPageProps) {
                   <input
                     id="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder="Minimum 8 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -116,18 +197,20 @@ export function LoginPage({ onShowSignup }: LoginPageProps) {
                   />
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <input
-                    id="rememberMe"
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    disabled={loading}
-                    className="w-4 h-4 rounded border-[#2d2d2d] bg-[#1a1a1a] text-white focus:ring-2 focus:ring-white disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                  <label htmlFor="rememberMe" className="text-sm font-medium text-white cursor-pointer">
-                    Remember Me
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium leading-none text-white">
+                    Confirm Password
                   </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    className="neumorphic-input flex h-11 w-full px-4 py-2 text-sm font-medium placeholder:text-[#e5e5e5] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  />
                 </div>
 
                 <button
@@ -138,21 +221,21 @@ export function LoginPage({ onShowSignup }: LoginPageProps) {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin inline" />
-                      Signing in...
+                      Creating account...
                     </>
                   ) : (
-                    'Sign In'
+                    'Create Account'
                   )}
                 </button>
 
                 <div className="text-center pt-2">
                   <button
                     type="button"
-                    onClick={handleCreateAccount}
+                    onClick={onBackToLogin}
                     disabled={loading}
                     className="text-sm text-[#888] hover:text-[#e5e5e5] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Don't have an account? Create one
+                    Already have an account? Sign in
                   </button>
                 </div>
               </form>

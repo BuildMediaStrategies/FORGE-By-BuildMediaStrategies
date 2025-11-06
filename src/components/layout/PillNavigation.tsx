@@ -1,4 +1,4 @@
-import { LayoutDashboard, Briefcase, Users, Building2, ClipboardList, FileText, Receipt, ChartBar as BarChart3, Settings, Bell, LogOut } from 'lucide-react';
+import { Briefcase, Users, Building2, ClipboardList, FileText, Receipt, ChartBar as BarChart3, Settings, Bell, LogOut } from 'lucide-react';
 
 interface PillNavigationProps {
   activePage: string;
@@ -8,7 +8,6 @@ interface PillNavigationProps {
 }
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'roles', label: 'Roles', icon: Briefcase },
   { id: 'candidates', label: 'Candidates', icon: Users },
   { id: 'clients', label: 'Clients', icon: Building2 },

@@ -55,12 +55,12 @@
   }
 
   .neumorphic-button:hover {
-    background: #252525;
+    background: #780A0F;
     box-shadow:
       6px 6px 14px rgba(0, 0, 0, 0.9),
-      -3px -3px 10px rgba(255, 255, 255, 0.06),
+      -3px -3px 10px rgba(163, 14, 21, 0.2),
       inset -2px -2px 4px rgba(0, 0, 0, 0.3),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.04);
+      inset 2px 2px 4px rgba(163, 14, 21, 0.1);
   }
 
   .neumorphic-button:active {
@@ -102,8 +102,8 @@
   .neumorphic-input:focus {
     box-shadow:
       inset 4px 4px 8px rgba(0, 0, 0, 0.7),
-      inset -2px -2px 6px rgba(255, 255, 255, 0.03),
-      0 0 0 2px rgba(255, 255, 255, 0.1);
+      inset -2px -2px 6px rgba(163, 14, 21, 0.1),
+      0 0 0 2px rgba(163, 14, 21, 0.3);
   }
 
   .neumorphic-icon-box {
@@ -134,11 +134,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #A30E15;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #780A0F;
 }
 
 body {
@@ -164,7 +164,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #A30E15;
 }
 button:focus,
 button:focus-visible {

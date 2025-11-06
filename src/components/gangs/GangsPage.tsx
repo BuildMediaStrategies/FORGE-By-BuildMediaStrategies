@@ -7,7 +7,17 @@ export function GangsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">Gangs</h1>
+          <h1
+            className="text-2xl sm:text-3xl font-black"
+            style={{
+              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            Gangs
+          </h1>
           <p className="text-[#e5e5e5] mt-1 font-medium">Organize your team into work crews</p>
         </div>
         <button className="neumorphic-button flex items-center gap-2 px-6 py-3 text-white font-semibold">

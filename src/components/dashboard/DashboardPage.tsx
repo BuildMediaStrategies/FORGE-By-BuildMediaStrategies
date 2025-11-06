@@ -8,11 +8,11 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon: Icon }: StatCardProps) {
   return (
-    <div className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a] transition-all duration-200 cursor-pointer hover:scale-[1.02]">
+    <div className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a] transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:border-[#A30E15]">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="neumorphic-icon-box p-3">
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="w-6 h-6 text-[#A30E15]" />
           </div>
         </div>
         <div className="space-y-1">
@@ -77,7 +77,17 @@ export function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">Dashboard</h1>
+          <h1
+            className="text-2xl sm:text-3xl font-black"
+            style={{
+              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            Dashboard
+          </h1>
           <p className="text-[#e5e5e5] mt-1 font-medium">Monitor your scaffolding projects and work orders</p>
         </div>
       </div>
@@ -125,7 +135,7 @@ export function DashboardPage() {
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className="neumorphic-icon-box p-3">
-              <Sparkles className="w-6 h-6 text-white" />
+              <Sparkles className="w-6 h-6 text-[#A30E15]" />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-black text-white mb-1">AI Insights</h3>

@@ -18,7 +18,17 @@ export function EquipmentPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white">Equipment Orders</h1>
+          <h1
+            className="text-2xl sm:text-3xl font-black"
+            style={{
+              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            Equipment Orders
+          </h1>
           <p className="text-[#e5e5e5] mt-1 font-medium">Track and manage equipment requests</p>
         </div>
         <button className="neumorphic-button flex items-center gap-2 px-6 py-3 text-white font-semibold">
@@ -35,7 +45,7 @@ export function EquipmentPage() {
             className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
               activeFilter === tab.id
                 ? 'neumorphic-button text-white'
-                : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525]'
+                : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F]'
             }`}
           >
             {tab.label}

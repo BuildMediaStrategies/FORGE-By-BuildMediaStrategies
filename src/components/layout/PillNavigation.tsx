@@ -26,7 +26,17 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
     <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full px-4">
       <div className="neumorphic-pill flex items-center justify-between px-6 h-[70px]" style={{ minWidth: '800px' }}>
         <div className="flex items-center gap-2">
-          <span className="text-[32px] font-black text-white tracking-tight">FORGE</span>
+          <span
+            className="text-[32px] font-black tracking-tight"
+            style={{
+              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            FORGE
+          </span>
         </div>
 
         <div className="flex items-center gap-6">
@@ -40,7 +50,7 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
                 className={`flex items-center gap-2 px-5 py-2.5 text-[16px] font-semibold transition-all duration-200 ${
                   isActive
                     ? 'neumorphic-button'
-                    : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525] rounded-full'
+                    : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F] rounded-full'
                 }`}
               >
                 <Icon className="w-5 h-5" />
@@ -53,11 +63,11 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
         <div className="flex items-center gap-2">
           <button className="neumorphic-button relative p-2 text-[#e5e5e5] hover:text-white transition-colors">
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full"></span>
+            <span className="absolute top-1 right-1 w-2 h-2 bg-[#A30E15] rounded-full"></span>
           </button>
 
           <div className="relative group">
-            <button className="flex items-center gap-2 hover:bg-[#252525] px-2 py-1 rounded-full transition-colors">
+            <button className="flex items-center gap-2 hover:bg-[#780A0F] px-2 py-1 rounded-full transition-colors">
               <div className="w-9 h-9 border border-[#2d2d2d] rounded-full bg-[#2d2d2d] flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{initials}</span>
               </div>
@@ -70,7 +80,7 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
               </div>
               <button
                 onClick={onLogout}
-                className="w-full flex items-center gap-2 px-4 py-3 text-[#e5e5e5] hover:bg-[#252525] hover:text-white transition-colors"
+                className="w-full flex items-center gap-2 px-4 py-3 text-[#e5e5e5] hover:bg-[#780A0F] hover:text-white transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out

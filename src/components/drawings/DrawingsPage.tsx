@@ -68,7 +68,17 @@ export function DrawingsPage() {
     <div className="min-h-screen bg-black pt-24">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">AI Scaffold Designer</h1>
+          <h1
+            className="text-4xl font-bold mb-2"
+            style={{
+              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            AI Scaffold Designer
+          </h1>
           <p className="text-[#e5e5e5]">Generate 2D/3D scaffold designs from photos or descriptions</p>
         </div>
 
@@ -79,7 +89,7 @@ export function DrawingsPage() {
               className={`flex-1 py-3 px-6 rounded-full font-semibold transition-all ${
                 activeTab === 'upload'
                   ? 'neumorphic-button text-white'
-                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525]'
+                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F]'
               }`}
             >
               Upload Photo
@@ -89,7 +99,7 @@ export function DrawingsPage() {
               className={`flex-1 py-3 px-6 rounded-full font-semibold transition-all ${
                 activeTab === 'manual'
                   ? 'neumorphic-button text-white'
-                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525]'
+                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F]'
               }`}
             >
               Describe Manually
@@ -144,7 +154,7 @@ export function DrawingsPage() {
                 <div className="neumorphic-card p-4 relative">
                   <button
                     onClick={handleRemoveImage}
-                    className="absolute top-6 right-6 neumorphic-button p-2 text-white hover:text-red-400 transition-colors z-10"
+                    className="absolute top-6 right-6 neumorphic-button p-2 text-white hover:text-[#A30E15] transition-colors z-10"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -239,7 +249,7 @@ export function DrawingsPage() {
             disabled={isGenerating}
             className="neumorphic-button px-12 py-4 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              background: isGenerating ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: isGenerating ? undefined : 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
               WebkitBackgroundClip: isGenerating ? undefined : 'text',
               WebkitTextFillColor: isGenerating ? undefined : 'transparent',
               backgroundClip: isGenerating ? undefined : 'text'
@@ -265,14 +275,14 @@ export function DrawingsPage() {
                 <h3 className="text-white font-bold text-lg mb-4">2D Elevation View</h3>
                 <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#2d2d2d]">
                   <svg viewBox="0 0 300 200" className="w-full h-full p-4">
-                    <rect x="50" y="20" width="200" height="160" fill="none" stroke="#667eea" strokeWidth="2" />
-                    <line x1="50" y1="60" x2="250" y2="60" stroke="#667eea" strokeWidth="1" />
-                    <line x1="50" y1="100" x2="250" y2="100" stroke="#667eea" strokeWidth="1" />
-                    <line x1="50" y1="140" x2="250" y2="140" stroke="#667eea" strokeWidth="1" />
-                    <line x1="90" y1="20" x2="90" y2="180" stroke="#667eea" strokeWidth="1" />
-                    <line x1="130" y1="20" x2="130" y2="180" stroke="#667eea" strokeWidth="1" />
-                    <line x1="170" y1="20" x2="170" y2="180" stroke="#667eea" strokeWidth="1" />
-                    <line x1="210" y1="20" x2="210" y2="180" stroke="#667eea" strokeWidth="1" />
+                    <rect x="50" y="20" width="200" height="160" fill="none" stroke="#A30E15" strokeWidth="2" />
+                    <line x1="50" y1="60" x2="250" y2="60" stroke="#A30E15" strokeWidth="1" />
+                    <line x1="50" y1="100" x2="250" y2="100" stroke="#A30E15" strokeWidth="1" />
+                    <line x1="50" y1="140" x2="250" y2="140" stroke="#A30E15" strokeWidth="1" />
+                    <line x1="90" y1="20" x2="90" y2="180" stroke="#A30E15" strokeWidth="1" />
+                    <line x1="130" y1="20" x2="130" y2="180" stroke="#A30E15" strokeWidth="1" />
+                    <line x1="170" y1="20" x2="170" y2="180" stroke="#A30E15" strokeWidth="1" />
+                    <line x1="210" y1="20" x2="210" y2="180" stroke="#A30E15" strokeWidth="1" />
                   </svg>
                 </div>
               </div>
@@ -283,7 +293,7 @@ export function DrawingsPage() {
                   <div className="text-center">
                     <div className="w-32 h-32 mx-auto mb-4 perspective-1000">
                       <div className="w-full h-full relative preserve-3d animate-[spin_8s_linear_infinite]">
-                        <div className="absolute inset-0 border-2 border-[#667eea] bg-[#667eea]/10"></div>
+                        <div className="absolute inset-0 border-2 border-[#A30E15] bg-[#A30E15]/10"></div>
                       </div>
                     </div>
                     <div className="flex gap-2 justify-center">
@@ -339,7 +349,7 @@ export function DrawingsPage() {
                 onClick={() => handleDownload('materials')}
                 className="neumorphic-button flex items-center gap-2 px-6 py-3"
                 style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'

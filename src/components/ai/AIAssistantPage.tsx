@@ -13,12 +13,20 @@ export function AIAssistantPage() {
         <div className="max-w-[1400px] mx-auto h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="flex flex-col items-center text-center max-w-2xl">
             <div className="neumorphic-icon-box p-8 mb-6">
-              <Sparkles className="w-16 h-16 text-white" style={{
-                filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
+              <Sparkles className="w-16 h-16 text-[#A30E15]" style={{
+                filter: 'drop-shadow(0 0 8px rgba(163, 14, 21, 0.5))'
               }} />
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-3">
+            <h1
+              className="text-3xl sm:text-4xl font-black mb-3"
+              style={{
+                background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}
+            >
               AI Assistant
             </h1>
 
@@ -64,7 +72,7 @@ export function AIAssistantPage() {
               <Send
                 className="w-6 h-6"
                 style={{
-                  filter: 'drop-shadow(0 0 6px rgba(255, 255, 255, 0.2))'
+                  filter: 'drop-shadow(0 0 6px rgba(163, 14, 21, 0.3))'
                 }}
               />
             </button>

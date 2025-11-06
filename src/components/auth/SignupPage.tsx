@@ -7,7 +7,7 @@ interface SignupPageProps {
   onBackToLogin: () => void;
 }
 
-export function SignupPage({ onSuccess, onBackToLogin }: SignupPageProps) {
+export function SignupPage({ onBackToLogin }: SignupPageProps) {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

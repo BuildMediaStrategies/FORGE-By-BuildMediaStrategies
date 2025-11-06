@@ -26,22 +26,37 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
     .toUpperCase();
 
   return (
-    <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full px-4">
-      <div className="neumorphic-pill flex items-center justify-between px-6 h-[70px]" style={{ minWidth: '800px' }}>
-        <div className="flex items-center gap-2">
-          <span
-            className="text-[28px] uppercase tracking-tighter"
-            style={{
-              fontFamily: '"Lombok", sans-serif',
-              color: '#A30E15',
-              WebkitTextStroke: '1px #A30E15'
-            }}
-          >
-            HAMILTON NEXUS
-          </span>
+    <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full px-2 sm:px-4">
+      <div className="neumorphic-pill flex items-center justify-between px-3 sm:px-6 h-[70px] max-w-[95vw] mx-auto overflow-x-auto">
+        <div className="flex items-center flex-shrink-0">
+          <div className="flex flex-col items-center leading-none">
+            <span
+              className="text-[20px] sm:text-[24px] uppercase tracking-tighter"
+              style={{
+                fontFamily: '"Lombok", sans-serif',
+                color: '#A30E15',
+                WebkitTextStroke: '1px #A30E15',
+                lineHeight: '1'
+              }}
+            >
+              HAMILTON
+            </span>
+            <span
+              className="text-[20px] sm:text-[24px] uppercase tracking-tighter"
+              style={{
+                fontFamily: '"Lombok", sans-serif',
+                color: '#A30E15',
+                WebkitTextStroke: '1px #A30E15',
+                lineHeight: '1',
+                marginTop: '2px'
+              }}
+            >
+              NEXUS
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 overflow-x-auto flex-1 justify-center mx-2 sm:mx-4">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.id;
@@ -49,28 +64,28 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`flex items-center gap-2 px-5 py-2.5 text-[16px] font-semibold transition-all duration-200 ${
+                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 lg:px-4 py-2 text-[14px] sm:text-[15px] font-semibold transition-all duration-200 whitespace-nowrap ${
                   isActive
                     ? 'neumorphic-button'
                     : 'text-[#666666] hover:text-white hover:bg-[#A30E15] rounded-full'
                 }`}
               >
-                <Icon className="w-5 h-5" />
-                <span className="hidden sm:inline">{item.label}</span>
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <span className="hidden lg:inline">{item.label}</span>
               </button>
             );
           })}
         </div>
 
-        <div className="flex items-center gap-2">
-          <button className="neumorphic-button relative p-2 text-[#000000] hover:text-white transition-colors">
-            <Bell className="w-5 h-5" />
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          <button className="neumorphic-button relative p-2 text-[#000000] hover:text-white transition-colors hidden sm:flex">
+            <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-[#A30E15] rounded-full"></span>
           </button>
 
           <div className="relative group">
-            <button className="flex items-center gap-2 hover:bg-[#A30E15] hover:text-white px-2 py-1 rounded-full transition-colors">
-              <div className="w-9 h-9 border border-[#e5e5e5] rounded-full bg-[#f5f5f5] flex items-center justify-center">
+            <button className="flex items-center gap-1 sm:gap-2 hover:bg-[#A30E15] hover:text-white px-1 sm:px-2 py-1 rounded-full transition-colors">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 border border-[#e5e5e5] rounded-full bg-[#f5f5f5] flex items-center justify-center">
                 <span className="text-black text-xs font-bold">{initials}</span>
               </div>
             </button>

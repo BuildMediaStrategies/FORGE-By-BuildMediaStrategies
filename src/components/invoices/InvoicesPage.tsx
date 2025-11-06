@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { Package, Plus } from 'lucide-react';
+import { Receipt, Plus } from 'lucide-react';
 
-type FilterTab = 'all' | 'pending' | 'approved' | 'delivered';
+type FilterTab = 'all' | 'draft' | 'sent' | 'paid';
 
-export function EquipmentPage() {
+export function InvoicesPage() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
-  const orders: any[] = [];
+  const invoices: any[] = [];
 
   const filterTabs: { id: FilterTab; label: string }[] = [
     { id: 'all', label: 'All' },
-    { id: 'pending', label: 'Pending' },
-    { id: 'approved', label: 'Approved' },
-    { id: 'delivered', label: 'Delivered' }
+    { id: 'draft', label: 'Draft' },
+    { id: 'sent', label: 'Sent' },
+    { id: 'paid', label: 'Paid' }
   ];
 
   return (
@@ -27,13 +27,13 @@ export function EquipmentPage() {
               backgroundClip: 'text'
             }}
           >
-            Equipment Orders
+            Invoices
           </h1>
-          <p className="text-[#666666] mt-1 font-medium">Track and manage equipment requests</p>
+          <p className="text-[#666666] mt-1 font-medium">Billing for recruitment and survey work</p>
         </div>
         <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
           <Plus className="w-5 h-5" />
-          Request Equipment
+          New Invoice
         </button>
       </div>
 
@@ -53,19 +53,19 @@ export function EquipmentPage() {
         ))}
       </div>
 
-      {orders.length === 0 ? (
+      {invoices.length === 0 ? (
         <div className="neumorphic-card border border-[#e5e5e5] bg-white">
           <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
             <div className="neumorphic-icon-box p-6 mb-6">
-              <Package className="w-12 h-12 text-[#A30E15]" />
+              <Receipt className="w-12 h-12 text-[#A30E15]" />
             </div>
-            <h2 className="text-2xl font-black text-black mb-2">No Equipment Orders</h2>
+            <h2 className="text-2xl font-black text-black mb-2">No Invoices Yet</h2>
             <p className="text-[#666666] mb-6 max-w-md">
-              Request equipment when needed on site
+              Create your first invoice
             </p>
             <button className="neumorphic-button flex items-center gap-2 px-8 py-3 font-semibold">
               <Plus className="w-5 h-5" />
-              Create First Request
+              Create First Invoice
             </button>
           </div>
         </div>

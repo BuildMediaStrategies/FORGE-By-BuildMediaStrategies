@@ -1,4 +1,4 @@
-import { LayoutDashboard, Briefcase, Users, Sparkles, Bell, LogOut, FileImage } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, Building2, ClipboardList, FileText, Receipt, BarChart3, Settings, Bell, LogOut } from 'lucide-react';
 
 interface PillNavigationProps {
   activePage: string;
@@ -9,11 +9,14 @@ interface PillNavigationProps {
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'jobs', label: 'Jobs', icon: Briefcase },
-  { id: 'equipment', label: 'Equipment', icon: Briefcase },
-  { id: 'drawings', label: 'Drawings', icon: FileImage },
-  { id: 'gangs', label: 'Gangs', icon: Users },
-  { id: 'ai', label: 'AI', icon: Sparkles },
+  { id: 'roles', label: 'Roles', icon: Briefcase },
+  { id: 'candidates', label: 'Candidates', icon: Users },
+  { id: 'clients', label: 'Clients', icon: Building2 },
+  { id: 'surveys', label: 'Surveys', icon: ClipboardList },
+  { id: 'documents', label: 'Documents', icon: FileText },
+  { id: 'invoices', label: 'Invoices', icon: Receipt },
+  { id: 'reports', label: 'Reports', icon: BarChart3 },
+  { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
 export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: PillNavigationProps) {
@@ -27,7 +30,7 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
       <div className="neumorphic-pill flex items-center justify-between px-6 h-[70px]" style={{ minWidth: '800px' }}>
         <div className="flex items-center gap-2">
           <span
-            className="text-[32px] font-black tracking-tight"
+            className="text-[24px] font-black tracking-tight"
             style={{
               background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
               WebkitBackgroundClip: 'text',
@@ -35,7 +38,7 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
               backgroundClip: 'text'
             }}
           >
-            FORGE
+            HAMILTON NEXUS
           </span>
         </div>
 

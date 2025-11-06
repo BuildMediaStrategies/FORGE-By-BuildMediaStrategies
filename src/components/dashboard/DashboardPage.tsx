@@ -1,4 +1,4 @@
-import { Briefcase, Package, Users, UserCheck, Plus, Sparkles, CheckCircle2, TrendingUp, FileText } from 'lucide-react';
+import { Briefcase, ClipboardList, Users, Building2, Plus, TrendingUp, Receipt } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
@@ -47,29 +47,29 @@ function ActivityItem({ icon: Icon, description, timeAgo }: ActivityItemProps) {
 export function DashboardPage() {
   const recentActivities = [
     {
-      icon: CheckCircle2,
-      description: 'System initialized successfully',
-      timeAgo: 'Just now'
+      icon: Briefcase,
+      description: 'New role posted: Senior Developer',
+      timeAgo: '2 hours ago'
     },
     {
       icon: Users,
-      description: 'Team workspace created',
-      timeAgo: '2 minutes ago'
+      description: 'Candidate moved to interviewing stage',
+      timeAgo: '5 hours ago'
     },
     {
-      icon: Briefcase,
-      description: 'Dashboard setup completed',
-      timeAgo: '5 minutes ago'
+      icon: ClipboardList,
+      description: 'Survey project completed',
+      timeAgo: '1 day ago'
     },
     {
-      icon: FileText,
-      description: 'Database schema configured',
-      timeAgo: '10 minutes ago'
+      icon: Receipt,
+      description: 'Invoice sent to client',
+      timeAgo: '2 days ago'
     },
     {
       icon: TrendingUp,
-      description: 'Analytics tracking enabled',
-      timeAgo: '15 minutes ago'
+      description: 'Monthly targets on track',
+      timeAgo: '3 days ago'
     }
   ];
 
@@ -88,41 +88,41 @@ export function DashboardPage() {
           >
             Dashboard
           </h1>
-          <p className="text-[#666666] mt-1 font-medium">Monitor your scaffolding projects and work orders</p>
+          <p className="text-[#666666] mt-1 font-medium">Overview of recruitment and survey operations</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Active Jobs"
+          title="Active Roles"
           value={0}
           icon={Briefcase}
         />
         <StatCard
-          title="Pending Equipment Orders"
-          value={0}
-          icon={Package}
-        />
-        <StatCard
-          title="Active Gangs"
+          title="Candidates in Pipeline"
           value={0}
           icon={Users}
         />
         <StatCard
-          title="Team Members"
+          title="Active Surveys"
           value={0}
-          icon={UserCheck}
+          icon={ClipboardList}
+        />
+        <StatCard
+          title="Client Companies"
+          value={0}
+          icon={Building2}
         />
       </div>
 
       <div className="flex flex-wrap gap-3">
         <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
           <Plus className="w-5 h-5" />
-          New Job
+          New Role
         </button>
         <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
           <Plus className="w-5 h-5" />
-          New Equipment Order
+          New Survey
         </button>
       </div>
 
@@ -132,12 +132,12 @@ export function DashboardPage() {
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className="neumorphic-icon-box p-3">
-              <Sparkles className="w-6 h-6 text-[#A30E15]" />
+              <TrendingUp className="w-6 h-6 text-[#A30E15]" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-black text-black mb-1">AI Insights</h3>
-              <p className="text-base font-semibold text-black mb-2">All systems running smoothly</p>
-              <p className="text-sm text-[#666666]">No urgent insights</p>
+              <h3 className="text-xl font-black text-black mb-1">Business Insights</h3>
+              <p className="text-base font-semibold text-black mb-2">Performance tracking active</p>
+              <p className="text-sm text-[#666666]">Ready to track recruitment and survey metrics</p>
             </div>
           </div>
         </div>

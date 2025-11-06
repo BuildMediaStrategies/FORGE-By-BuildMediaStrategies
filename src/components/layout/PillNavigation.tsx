@@ -1,4 +1,4 @@
-import { LayoutDashboard, Briefcase, Users, Building2, ClipboardList, FileText, Receipt, BarChart3, Settings, Bell, LogOut } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, Building2, ClipboardList, FileText, Receipt, ChartBar as BarChart3, Settings, Bell, LogOut } from 'lucide-react';
 
 interface PillNavigationProps {
   activePage: string;

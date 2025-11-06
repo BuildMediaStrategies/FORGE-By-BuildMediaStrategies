@@ -30,12 +30,11 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
       <div className="neumorphic-pill flex items-center justify-between px-6 h-[70px]" style={{ minWidth: '800px' }}>
         <div className="flex items-center gap-2">
           <span
-            className="text-[24px] font-black tracking-tight"
+            className="text-[28px] uppercase tracking-tighter"
             style={{
-              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
+              fontFamily: '"Lombok", sans-serif',
+              color: '#A30E15',
+              WebkitTextStroke: '1px #A30E15'
             }}
           >
             HAMILTON NEXUS

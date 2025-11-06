@@ -29,7 +29,10 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
     <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full px-2 sm:px-4">
       <div className="neumorphic-pill flex items-center justify-between px-3 sm:px-6 h-[70px] max-w-[95vw] mx-auto overflow-x-auto">
         <div className="flex items-center flex-shrink-0">
-          <div className="flex flex-col items-center leading-none">
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="flex flex-col items-center leading-none hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <span
               className="text-[20px] sm:text-[24px] uppercase tracking-tighter"
               style={{
@@ -53,7 +56,7 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
             >
               NEXUS
             </span>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 overflow-x-auto flex-1 justify-center mx-2 sm:mx-4">

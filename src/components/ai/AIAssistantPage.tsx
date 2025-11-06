@@ -8,7 +8,7 @@ export function AIAssistantPage() {
   ];
 
   return (
-    <div className="fixed inset-0 pt-24 bg-black flex flex-col">
+    <div className="fixed inset-0 pt-24 bg-white flex flex-col">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-[1400px] mx-auto h-full flex items-center justify-center p-4 sm:p-6 lg:p-8">
           <div className="flex flex-col items-center text-center max-w-2xl">
@@ -30,7 +30,7 @@ export function AIAssistantPage() {
               AI Assistant
             </h1>
 
-            <p className="text-[#e5e5e5] text-lg mb-8">
+            <p className="text-[#666666] text-lg mb-8">
               Ask me anything about your projects
             </p>
 
@@ -38,7 +38,7 @@ export function AIAssistantPage() {
               {examplePrompts.map((prompt, index) => (
                 <button
                   key={index}
-                  className="neumorphic-button px-6 py-3 text-white font-medium text-sm hover:scale-105 transition-transform"
+                  className="neumorphic-button px-6 py-3 font-medium text-sm hover:scale-105 transition-transform"
                 >
                   {prompt}
                 </button>
@@ -48,26 +48,26 @@ export function AIAssistantPage() {
         </div>
       </div>
 
-      <div className="border-t border-[#2d2d2d] bg-black">
+      <div className="border-t border-[#e5e5e5] bg-white">
         <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
           <div className="flex gap-3 items-end">
             <div className="flex-1">
               <div
-                className="rounded-2xl px-6 py-4 bg-[#1a1a1a] border border-[#2d2d2d]"
+                className="rounded-2xl px-6 py-4 bg-[#f9f9f9] border border-[#e5e5e5]"
                 style={{
-                  boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
+                  boxShadow: 'inset 3px 3px 6px rgba(0, 0, 0, 0.08), inset -1px -1px 3px rgba(255, 255, 255, 1)'
                 }}
               >
                 <input
                   type="text"
                   placeholder="Type your message..."
-                  className="w-full bg-transparent text-white placeholder-[#666] outline-none text-base"
+                  className="w-full bg-transparent text-black placeholder-[#999] outline-none text-base"
                 />
               </div>
             </div>
 
             <button
-              className="neumorphic-button p-4 rounded-2xl text-white hover:scale-105 transition-transform flex-shrink-0"
+              className="neumorphic-button p-4 rounded-2xl hover:scale-105 transition-transform flex-shrink-0"
             >
               <Send
                 className="w-6 h-6"

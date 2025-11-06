@@ -65,7 +65,7 @@ export function DrawingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black pt-24">
+    <div className="min-h-screen bg-white pt-24">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
           <h1
@@ -79,7 +79,7 @@ export function DrawingsPage() {
           >
             AI Scaffold Designer
           </h1>
-          <p className="text-[#e5e5e5]">Generate 2D/3D scaffold designs from photos or descriptions</p>
+          <p className="text-[#666666]">Generate 2D/3D scaffold designs from photos or descriptions</p>
         </div>
 
         <div className="neumorphic-card p-8 mb-8">
@@ -88,8 +88,8 @@ export function DrawingsPage() {
               onClick={() => setActiveTab('upload')}
               className={`flex-1 py-3 px-6 rounded-full font-semibold transition-all ${
                 activeTab === 'upload'
-                  ? 'neumorphic-button text-white'
-                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F]'
+                  ? 'neumorphic-button'
+                  : 'text-[#666666] hover:text-white hover:bg-[#A30E15]'
               }`}
             >
               Upload Photo
@@ -98,8 +98,8 @@ export function DrawingsPage() {
               onClick={() => setActiveTab('manual')}
               className={`flex-1 py-3 px-6 rounded-full font-semibold transition-all ${
                 activeTab === 'manual'
-                  ? 'neumorphic-button text-white'
-                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F]'
+                  ? 'neumorphic-button'
+                  : 'text-[#666666] hover:text-white hover:bg-[#A30E15]'
               }`}
             >
               Describe Manually
@@ -108,9 +108,9 @@ export function DrawingsPage() {
 
           {activeTab === 'upload' ? (
             <div>
-              <div className="border-2 border-dashed border-[#2d2d2d] rounded-lg p-12 text-center mb-6 hover:border-[#3d3d3d] transition-colors">
-                <ImageIcon className="w-16 h-16 mx-auto mb-4 text-[#e5e5e5]" />
-                <p className="text-[#e5e5e5] mb-6">Drag photo here or click to upload</p>
+              <div className="border-2 border-dashed border-[#e5e5e5] rounded-lg p-12 text-center mb-6 hover:border-[#A30E15] transition-colors">
+                <ImageIcon className="w-16 h-16 mx-auto mb-4 text-[#A30E15]" />
+                <p className="text-[#666666] mb-6">Drag photo here or click to upload</p>
 
                 <div className="flex flex-col gap-3 max-w-md mx-auto">
                   <label className="neumorphic-button cursor-pointer flex items-center justify-center gap-2 py-3 px-6">
@@ -154,7 +154,7 @@ export function DrawingsPage() {
                 <div className="neumorphic-card p-4 relative">
                   <button
                     onClick={handleRemoveImage}
-                    className="absolute top-6 right-6 neumorphic-button p-2 text-white hover:text-[#A30E15] transition-colors z-10"
+                    className="absolute top-6 right-6 neumorphic-button p-2 hover:text-[#A30E15] transition-colors z-10"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -169,12 +169,12 @@ export function DrawingsPage() {
           ) : (
             <div className="space-y-6">
               <div>
-                <label className="block text-white font-semibold mb-2">Building Description</label>
+                <label className="block text-black font-semibold mb-2">Building Description</label>
                 <textarea
                   value={buildingDescription}
                   onChange={(e) => setBuildingDescription(e.target.value)}
                   placeholder="Describe the building... e.g., 3-story brick office building, 40ft height, flat roof, street access on two sides"
-                  className="w-full h-32 bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-4 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
+                  className="w-full h-32 bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg p-4 text-black placeholder-[#999] focus:outline-none focus:border-[#A30E15]"
                   style={{
                     boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
                   }}
@@ -183,39 +183,39 @@ export function DrawingsPage() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-white font-semibold mb-2">Height (meters)</label>
+                  <label className="block text-black font-semibold mb-2">Height (meters)</label>
                   <input
                     type="number"
                     value={dimensions.height}
                     onChange={(e) => setDimensions({ ...dimensions, height: e.target.value })}
                     placeholder="0"
-                    className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg p-3 text-black placeholder-[#999] focus:outline-none focus:border-[#A30E15]"
                     style={{
                       boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
                     }}
                   />
                 </div>
                 <div>
-                  <label className="block text-white font-semibold mb-2">Width (meters)</label>
+                  <label className="block text-black font-semibold mb-2">Width (meters)</label>
                   <input
                     type="number"
                     value={dimensions.width}
                     onChange={(e) => setDimensions({ ...dimensions, width: e.target.value })}
                     placeholder="0"
-                    className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg p-3 text-black placeholder-[#999] focus:outline-none focus:border-[#A30E15]"
                     style={{
                       boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
                     }}
                   />
                 </div>
                 <div>
-                  <label className="block text-white font-semibold mb-2">Length (meters)</label>
+                  <label className="block text-black font-semibold mb-2">Length (meters)</label>
                   <input
                     type="number"
                     value={dimensions.length}
                     onChange={(e) => setDimensions({ ...dimensions, length: e.target.value })}
                     placeholder="0"
-                    className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg p-3 text-black placeholder-[#999] focus:outline-none focus:border-[#A30E15]"
                     style={{
                       boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
                     }}
@@ -224,11 +224,11 @@ export function DrawingsPage() {
               </div>
 
               <div>
-                <label className="block text-white font-semibold mb-2">Building Type</label>
+                <label className="block text-black font-semibold mb-2">Building Type</label>
                 <select
                   value={buildingType}
                   onChange={(e) => setBuildingType(e.target.value)}
-                  className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white focus:outline-none focus:border-[#3d3d3d]"
+                  className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg p-3 text-white focus:outline-none focus:border-[#A30E15]"
                   style={{
                     boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
                   }}
@@ -261,9 +261,9 @@ export function DrawingsPage() {
           {isGenerating && (
             <div className="mt-6">
               <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 border-4 border-[#2d2d2d] border-t-white rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-[#2d2d2d] border-t-[#A30E15] rounded-full animate-spin"></div>
               </div>
-              <p className="text-white font-semibold">{generationSteps[generationStep]}</p>
+              <p className="text-black font-semibold">{generationSteps[generationStep]}</p>
             </div>
           )}
         </div>
@@ -272,8 +272,8 @@ export function DrawingsPage() {
           <div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <div className="neumorphic-card p-6">
-                <h3 className="text-white font-bold text-lg mb-4">2D Elevation View</h3>
-                <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#2d2d2d]">
+                <h3 className="text-black font-bold text-lg mb-4">2D Elevation View</h3>
+                <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#e5e5e5]">
                   <svg viewBox="0 0 300 200" className="w-full h-full p-4">
                     <rect x="50" y="20" width="200" height="160" fill="none" stroke="#A30E15" strokeWidth="2" />
                     <line x1="50" y1="60" x2="250" y2="60" stroke="#A30E15" strokeWidth="1" />
@@ -288,8 +288,8 @@ export function DrawingsPage() {
               </div>
 
               <div className="neumorphic-card p-6">
-                <h3 className="text-white font-bold text-lg mb-4">3D Interactive Model</h3>
-                <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#2d2d2d] relative">
+                <h3 className="text-black font-bold text-lg mb-4">3D Interactive Model</h3>
+                <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#e5e5e5] relative">
                   <div className="text-center">
                     <div className="w-32 h-32 mx-auto mb-4 perspective-1000">
                       <div className="w-full h-full relative preserve-3d animate-[spin_8s_linear_infinite]">
@@ -297,10 +297,10 @@ export function DrawingsPage() {
                       </div>
                     </div>
                     <div className="flex gap-2 justify-center">
-                      <button className="neumorphic-button p-2 text-[#e5e5e5] hover:text-white">
+                      <button className="neumorphic-button p-2 text-[#666666] hover:text-white">
                         <RotateCw className="w-4 h-4" />
                       </button>
-                      <button className="neumorphic-button p-2 text-[#e5e5e5] hover:text-white">
+                      <button className="neumorphic-button p-2 text-[#666666] hover:text-white">
                         <Settings className="w-4 h-4" />
                       </button>
                     </div>
@@ -309,21 +309,21 @@ export function DrawingsPage() {
               </div>
 
               <div className="neumorphic-card p-6">
-                <h3 className="text-white font-bold text-lg mb-4">Material List</h3>
+                <h3 className="text-black font-bold text-lg mb-4">Material List</h3>
                 <div className="space-y-3">
                   {mockMaterialList.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center pb-2 border-b border-[#2d2d2d]">
+                    <div key={index} className="flex justify-between items-center pb-2 border-b border-[#e5e5e5]">
                       <div>
-                        <p className="text-white font-semibold text-sm">{item.item}</p>
+                        <p className="text-black font-semibold text-sm">{item.item}</p>
                         <p className="text-[#999] text-xs">{item.unit}</p>
                       </div>
-                      <span className="text-white font-bold">{item.quantity}</span>
+                      <span className="text-black font-bold">{item.quantity}</span>
                     </div>
                   ))}
-                  <div className="pt-2 mt-2 border-t-2 border-[#2d2d2d]">
+                  <div className="pt-2 mt-2 border-t-2 border-[#e5e5e5]">
                     <div className="flex justify-between items-center">
-                      <span className="text-white font-bold">Total Weight</span>
-                      <span className="text-white font-bold">{totalWeight} kg</span>
+                      <span className="text-black font-bold">Total Weight</span>
+                      <span className="text-black font-bold">{totalWeight} kg</span>
                     </div>
                   </div>
                 </div>
@@ -360,7 +360,7 @@ export function DrawingsPage() {
               </button>
               <button
                 onClick={() => setShowOutput(false)}
-                className="neumorphic-button flex items-center gap-2 px-6 py-3 border border-[#2d2d2d]"
+                className="neumorphic-button flex items-center gap-2 px-6 py-3 border border-[#e5e5e5]"
               >
                 <Settings className="w-5 h-5" />
                 Adjust Design

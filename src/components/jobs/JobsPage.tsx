@@ -29,9 +29,9 @@ export function JobsPage() {
           >
             Jobs
           </h1>
-          <p className="text-[#e5e5e5] mt-1 font-medium">Manage your scaffolding projects</p>
+          <p className="text-[#666666] mt-1 font-medium">Manage your scaffolding projects</p>
         </div>
-        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 text-white font-semibold">
+        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
           <Plus className="w-5 h-5" />
           New Job
         </button>
@@ -44,8 +44,8 @@ export function JobsPage() {
             onClick={() => setActiveFilter(tab.id)}
             className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
               activeFilter === tab.id
-                ? 'neumorphic-button text-white'
-                : 'text-[#e5e5e5] hover:text-white hover:bg-[#780A0F]'
+                ? 'neumorphic-button'
+                : 'text-[#666666] hover:text-white hover:bg-[#A30E15]'
             }`}
           >
             {tab.label}
@@ -54,16 +54,16 @@ export function JobsPage() {
       </div>
 
       {jobs.length === 0 ? (
-        <div className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a]">
+        <div className="neumorphic-card border border-[#e5e5e5] bg-white">
           <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
             <div className="neumorphic-icon-box p-6 mb-6">
-              <Briefcase className="w-12 h-12 text-white" />
+              <Briefcase className="w-12 h-12 text-[#A30E15]" />
             </div>
-            <h2 className="text-2xl font-black text-white mb-2">No Jobs Yet</h2>
-            <p className="text-[#e5e5e5] mb-6 max-w-md">
+            <h2 className="text-2xl font-black text-black mb-2">No Jobs Yet</h2>
+            <p className="text-[#666666] mb-6 max-w-md">
               Create your first scaffolding project
             </p>
-            <button className="neumorphic-button flex items-center gap-2 px-8 py-3 text-white font-semibold">
+            <button className="neumorphic-button flex items-center gap-2 px-8 py-3 font-semibold">
               <Plus className="w-5 h-5" />
               Create First Job
             </button>

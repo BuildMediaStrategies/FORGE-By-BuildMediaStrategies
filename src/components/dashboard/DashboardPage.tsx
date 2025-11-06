@@ -8,7 +8,7 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon: Icon }: StatCardProps) {
   return (
-    <div className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a] transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:border-[#A30E15]">
+    <div className="neumorphic-card border border-[#e5e5e5] bg-white transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:border-[#A30E15]">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="neumorphic-icon-box p-3">
@@ -16,8 +16,8 @@ function StatCard({ title, value, icon: Icon }: StatCardProps) {
           </div>
         </div>
         <div className="space-y-1">
-          <p className="text-[32px] font-black text-white">{value}</p>
-          <p className="text-sm font-semibold text-[#e5e5e5] uppercase tracking-wide">{title}</p>
+          <p className="text-[32px] font-black text-black">{value}</p>
+          <p className="text-sm font-semibold text-[#666666] uppercase tracking-wide">{title}</p>
         </div>
       </div>
     </div>
@@ -34,11 +34,11 @@ function ActivityItem({ icon: Icon, description, timeAgo }: ActivityItemProps) {
   return (
     <div className="flex items-start gap-4 py-4">
       <div className="neumorphic-icon-box p-2 mt-1">
-        <Icon className="w-4 h-4 text-white" />
+        <Icon className="w-4 h-4 text-[#A30E15]" />
       </div>
       <div className="flex-1">
-        <p className="text-sm font-medium text-white">{description}</p>
-        <p className="text-xs text-[#e5e5e5] mt-1">{timeAgo}</p>
+        <p className="text-sm font-medium text-black">{description}</p>
+        <p className="text-xs text-[#666666] mt-1">{timeAgo}</p>
       </div>
     </div>
   );
@@ -88,7 +88,7 @@ export function DashboardPage() {
           >
             Dashboard
           </h1>
-          <p className="text-[#e5e5e5] mt-1 font-medium">Monitor your scaffolding projects and work orders</p>
+          <p className="text-[#666666] mt-1 font-medium">Monitor your scaffolding projects and work orders</p>
         </div>
       </div>
 
@@ -116,21 +116,18 @@ export function DashboardPage() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 text-white font-semibold">
+        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
           <Plus className="w-5 h-5" />
           New Job
         </button>
-        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 text-white font-semibold">
+        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
           <Plus className="w-5 h-5" />
           New Equipment Order
         </button>
       </div>
 
       <div
-        className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a] overflow-hidden"
-        style={{
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)'
-        }}
+        className="neumorphic-card border border-[#e5e5e5] bg-white overflow-hidden"
       >
         <div className="p-6">
           <div className="flex items-start gap-4">
@@ -138,18 +135,18 @@ export function DashboardPage() {
               <Sparkles className="w-6 h-6 text-[#A30E15]" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-black text-white mb-1">AI Insights</h3>
-              <p className="text-base font-semibold text-white mb-2">All systems running smoothly</p>
-              <p className="text-sm text-[#e5e5e5]">No urgent insights</p>
+              <h3 className="text-xl font-black text-black mb-1">AI Insights</h3>
+              <p className="text-base font-semibold text-black mb-2">All systems running smoothly</p>
+              <p className="text-sm text-[#666666]">No urgent insights</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a]">
+      <div className="neumorphic-card border border-[#e5e5e5] bg-white">
         <div className="p-6">
-          <h3 className="text-lg font-bold text-white mb-4">Recent Activity</h3>
-          <div className="divide-y divide-[#2d2d2d]">
+          <h3 className="text-lg font-bold text-black mb-4">Recent Activity</h3>
+          <div className="divide-y divide-[#e5e5e5]">
             {recentActivities.map((activity, index) => (
               <ActivityItem
                 key={index}

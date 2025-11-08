@@ -1,39 +1,29 @@
 import { useState } from 'react';
 import { Briefcase, Plus } from 'lucide-react';
 
-type FilterTab = 'all' | 'active' | 'filled' | 'closed';
+type FilterTab = 'all' | 'active' | 'planning' | 'completed';
 
-export function RolesPage() {
+export function JobsPage() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
-  const roles: any[] = [];
+  const jobs: any[] = [];
 
   const filterTabs: { id: FilterTab; label: string }[] = [
     { id: 'all', label: 'All' },
     { id: 'active', label: 'Active' },
-    { id: 'filled', label: 'Filled' },
-    { id: 'closed', label: 'Closed' }
+    { id: 'planning', label: 'Planning' },
+    { id: 'completed', label: 'Completed' }
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1
-            className="text-2xl sm:text-3xl font-black"
-            style={{
-              background: 'linear-gradient(135deg, #A30E15 0%, #780A0F 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
-            Roles
-          </h1>
-          <p className="text-[#666666] mt-1 font-medium">Live job listings and management</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-white">Jobs</h1>
+          <p className="text-[#e5e5e5] mt-1 font-medium">Manage your scaffolding projects</p>
         </div>
-        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 font-semibold">
+        <button className="neumorphic-button flex items-center gap-2 px-6 py-3 text-white font-semibold">
           <Plus className="w-5 h-5" />
-          New Role
+          New Job
         </button>
       </div>
 
@@ -44,8 +34,8 @@ export function RolesPage() {
             onClick={() => setActiveFilter(tab.id)}
             className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
               activeFilter === tab.id
-                ? 'neumorphic-button'
-                : 'text-[#666666] hover:text-white hover:bg-[#A30E15]'
+                ? 'neumorphic-button text-white'
+                : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525]'
             }`}
           >
             {tab.label}
@@ -53,19 +43,19 @@ export function RolesPage() {
         ))}
       </div>
 
-      {roles.length === 0 ? (
-        <div className="neumorphic-card border border-[#e5e5e5] bg-white">
+      {jobs.length === 0 ? (
+        <div className="neumorphic-card border border-[#2d2d2d] bg-[#1a1a1a]">
           <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
             <div className="neumorphic-icon-box p-6 mb-6">
-              <Briefcase className="w-12 h-12 text-[#A30E15]" />
+              <Briefcase className="w-12 h-12 text-white" />
             </div>
-            <h2 className="text-2xl font-black text-black mb-2">No Roles Yet</h2>
-            <p className="text-[#666666] mb-6 max-w-md">
-              Create your first job listing
+            <h2 className="text-2xl font-black text-white mb-2">No Jobs Yet</h2>
+            <p className="text-[#e5e5e5] mb-6 max-w-md">
+              Create your first scaffolding project
             </p>
-            <button className="neumorphic-button flex items-center gap-2 px-8 py-3 font-semibold">
+            <button className="neumorphic-button flex items-center gap-2 px-8 py-3 text-white font-semibold">
               <Plus className="w-5 h-5" />
-              Create First Role
+              Create First Job
             </button>
           </div>
         </div>

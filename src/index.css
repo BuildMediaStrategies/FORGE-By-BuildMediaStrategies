@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'Lombok';
-  src: url('/fonts/Lombok Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
 @layer utilities {
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
@@ -50,82 +43,77 @@
   }
 
   .neumorphic-button {
-    background: #ffffff;
+    background: #1a1a1a;
     box-shadow:
-      4px 4px 8px rgba(0, 0, 0, 0.1),
-      -2px -2px 6px rgba(255, 255, 255, 1),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.05),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+      8px 8px 16px rgba(0, 0, 0, 0.9),
+      -4px -4px 12px rgba(255, 255, 255, 0.05),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.4),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.03);
     border-radius: 12px;
-    border: 1px solid #e5e5e5;
-    color: #000000;
+    color: #ffffff;
     transition: all 0.2s ease;
   }
 
   .neumorphic-button:hover {
-    background: #A30E15;
-    color: #ffffff;
+    background: #252525;
     box-shadow:
-      4px 4px 10px rgba(163, 14, 21, 0.3),
-      -2px -2px 6px rgba(255, 255, 255, 1),
-      inset -1px -1px 2px rgba(120, 10, 15, 0.2),
-      inset 1px 1px 2px rgba(163, 14, 21, 0.1);
+      6px 6px 14px rgba(0, 0, 0, 0.9),
+      -3px -3px 10px rgba(255, 255, 255, 0.06),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.3),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.04);
   }
 
   .neumorphic-button:active {
-    background: #780A0F;
-    color: #ffffff;
+    background: #151515;
     box-shadow:
-      inset 3px 3px 6px rgba(120, 10, 15, 0.4),
-      inset -1px -1px 3px rgba(163, 14, 21, 0.2);
+      inset 4px 4px 8px rgba(0, 0, 0, 0.8),
+      inset -2px -2px 6px rgba(255, 255, 255, 0.02);
   }
 
   .neumorphic-card {
-    background: #ffffff;
+    background: #1a1a1a;
     box-shadow:
-      6px 6px 12px rgba(0, 0, 0, 0.08),
-      -3px -3px 8px rgba(255, 255, 255, 1);
+      10px 10px 20px rgba(0, 0, 0, 0.8),
+      -5px -5px 15px rgba(255, 255, 255, 0.02);
     border-radius: 16px;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #2d2d2d;
   }
 
   .neumorphic-pill {
-    background: #ffffff;
+    background: #1a1a1a;
     box-shadow:
-      6px 6px 12px rgba(0, 0, 0, 0.08),
-      -3px -3px 8px rgba(255, 255, 255, 1);
+      10px 10px 20px rgba(0, 0, 0, 0.8),
+      -5px -5px 15px rgba(255, 255, 255, 0.02);
     border-radius: 50px;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #2d2d2d;
   }
 
   .neumorphic-input {
-    background: #f9f9f9;
+    background: #0f0f0f;
     box-shadow:
-      inset 3px 3px 6px rgba(0, 0, 0, 0.08),
-      inset -1px -1px 3px rgba(255, 255, 255, 1);
+      inset 4px 4px 8px rgba(0, 0, 0, 0.6),
+      inset -2px -2px 6px rgba(255, 255, 255, 0.02);
     border-radius: 12px;
-    border: 1px solid #e5e5e5;
-    color: #000000;
+    border: 1px solid #2d2d2d;
+    color: #ffffff;
     transition: all 0.2s ease;
   }
 
   .neumorphic-input:focus {
     box-shadow:
-      inset 3px 3px 6px rgba(0, 0, 0, 0.1),
-      inset -1px -1px 3px rgba(255, 255, 255, 1),
-      0 0 0 2px rgba(163, 14, 21, 0.3);
-    border-color: #A30E15;
+      inset 4px 4px 8px rgba(0, 0, 0, 0.7),
+      inset -2px -2px 6px rgba(255, 255, 255, 0.03),
+      0 0 0 2px rgba(255, 255, 255, 0.1);
   }
 
   .neumorphic-icon-box {
-    background: #ffffff;
+    background: #1a1a1a;
     box-shadow:
-      4px 4px 8px rgba(0, 0, 0, 0.08),
-      -2px -2px 6px rgba(255, 255, 255, 1),
-      inset -1px -1px 2px rgba(0, 0, 0, 0.03),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.9);
+      6px 6px 12px rgba(0, 0, 0, 0.8),
+      -3px -3px 8px rgba(255, 255, 255, 0.03),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.3),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.02);
     border-radius: 12px;
-    border: 1px solid #e5e5e5;
   }
 }
 
@@ -134,9 +122,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light;
-  color: #000000;
-  background-color: #ffffff;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -146,18 +134,17 @@
 
 a {
   font-weight: 500;
-  color: #A30E15;
+  color: #646cff;
   text-decoration: inherit;
 }
 a:hover {
-  color: #780A0F;
+  color: #535bf2;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #ffffff;
 }
 
 h1 {
@@ -167,18 +154,17 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #A30E15;
+  border-color: #646cff;
 }
 button:focus,
 button:focus-visible {
@@ -200,32 +186,58 @@ button:focus-visible {
 
 @layer base {
   :root {
-    /* Hamilton Nexus White Theme with Red Accents */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 355 87% 34%;
+    /* Forge Neumorphic Black Theme */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 10%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 355 87% 34%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 90%;
+    --accent: 0 0% 18%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 0% 10%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 355 87% 34%;
-    --chart-1: 355 87% 34%;
-    --chart-2: 355 87% 45%;
-    --chart-3: 355 87% 55%;
-    --chart-4: 355 87% 65%;
-    --chart-5: 355 87% 40%;
+    --border: 0 0% 18%;
+    --input: 0 0% 10%;
+    --ring: 0 0% 100%;
+    --chart-1: 0 0% 30%;
+    --chart-2: 0 0% 45%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 75%;
+    --chart-5: 0 0% 50%;
     --radius: 0.25rem;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 

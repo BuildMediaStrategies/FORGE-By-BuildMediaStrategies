@@ -3,11 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+console.log('[Supabase] Initializing client...');
+console.log('[Supabase] URL:', supabaseUrl);
+console.log('[Supabase] Anon key present:', !!supabaseAnonKey);
+
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+console.log('[Supabase] Client created successfully');
 
 export interface Drawing {
   id: string;
@@ -25,11 +31,21 @@ export async function uploadDrawing(
   onProgress?: (progress: number) => void
 ): Promise<{ data: Drawing | null; error: Error | null }> {
   try {
+    console.log('[Upload] Starting upload for file:', file.name, 'Size:', file.size, 'Type:', file.type);
+    console.log('[Upload] User ID:', userId);
+
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `${userId}/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
+    console.log('[Upload] File path:', filePath);
+    console.log('[Upload] Uploading to Supabase Storage...');
+
+    if (onProgress) {
+      onProgress(10);
+    }
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from('drawings')
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -37,12 +53,27 @@ export async function uploadDrawing(
       });
 
     if (uploadError) {
-      throw uploadError;
+      console.error('[Upload] Storage upload error:', uploadError);
+      throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
+
+    console.log('[Upload] Storage upload successful:', uploadData);
+
+    if (onProgress) {
+      onProgress(50);
     }
 
     const { data: urlData } = supabase.storage
       .from('drawings')
       .getPublicUrl(filePath);
+
+    console.log('[Upload] Public URL:', urlData.publicUrl);
+
+    if (onProgress) {
+      onProgress(70);
+    }
+
+    console.log('[Upload] Inserting record into database...');
 
     const { data: dbData, error: dbError } = await supabase
       .from('drawings')
@@ -56,16 +87,21 @@ export async function uploadDrawing(
       .maybeSingle();
 
     if (dbError) {
+      console.error('[Upload] Database insert error:', dbError);
       await supabase.storage.from('drawings').remove([filePath]);
-      throw dbError;
+      throw new Error(`Database insert failed: ${dbError.message}`);
     }
+
+    console.log('[Upload] Database insert successful:', dbData);
 
     if (onProgress) {
       onProgress(100);
     }
 
+    console.log('[Upload] Upload completed successfully!');
     return { data: dbData, error: null };
   } catch (error) {
+    console.error('[Upload] Upload failed with error:', error);
     return { data: null, error: error as Error };
   }
 }

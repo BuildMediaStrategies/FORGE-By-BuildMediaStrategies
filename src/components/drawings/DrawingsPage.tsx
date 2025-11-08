@@ -14,6 +14,7 @@ export function DrawingsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [userId] = useState<string>('00000000-0000-0000-0000-000000000000');
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -75,26 +76,47 @@ export function DrawingsPage() {
   }
 
   async function handleUpload() {
-    if (!userId || selectedFiles.length === 0) return;
+    if (!userId || selectedFiles.length === 0) {
+      console.log('[DrawingsPage] Cannot upload: userId or selectedFiles missing', { userId, filesCount: selectedFiles.length });
+      return;
+    }
 
+    console.log('[DrawingsPage] Starting upload process for', selectedFiles.length, 'files');
     setUploading(true);
     setUploadProgress(0);
+    setUploadError(null);
+
+    let successCount = 0;
+    let failCount = 0;
 
     for (let i = 0; i < selectedFiles.length; i++) {
       const file = selectedFiles[i];
-      const { error } = await uploadDrawing(file, userId, (progress) => {
-        setUploadProgress(((i + progress / 100) / selectedFiles.length) * 100);
+      console.log(`[DrawingsPage] Uploading file ${i + 1}/${selectedFiles.length}:`, file.name);
+
+      const { data, error } = await uploadDrawing(file, userId, (progress) => {
+        const overallProgress = ((i + progress / 100) / selectedFiles.length) * 100;
+        console.log(`[DrawingsPage] Progress: ${overallProgress.toFixed(1)}%`);
+        setUploadProgress(overallProgress);
       });
 
       if (error) {
-        console.error('Upload error:', error);
+        console.error(`[DrawingsPage] Failed to upload ${file.name}:`, error);
+        setUploadError(`Failed to upload ${file.name}: ${error.message}`);
+        failCount++;
+      } else {
+        console.log(`[DrawingsPage] Successfully uploaded ${file.name}:`, data);
+        successCount++;
       }
     }
+
+    console.log(`[DrawingsPage] Upload complete. Success: ${successCount}, Failed: ${failCount}`);
 
     setSelectedFiles([]);
     setPreviewUrls([]);
     setUploading(false);
     setUploadProgress(0);
+
+    console.log('[DrawingsPage] Reloading drawings...');
     await loadDrawings(userId);
   }
 
@@ -200,6 +222,24 @@ export function DrawingsPage() {
                   </div>
                 ))}
               </div>
+
+              {uploadError && (
+                <div className="mb-6 p-4 bg-red-900/20 border-2 border-red-500 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <X className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="text-red-400 font-semibold mb-1">Upload Failed</h4>
+                      <p className="text-red-300 text-sm">{uploadError}</p>
+                    </div>
+                    <button
+                      onClick={() => setUploadError(null)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {uploading && (
                 <div className="mb-6">

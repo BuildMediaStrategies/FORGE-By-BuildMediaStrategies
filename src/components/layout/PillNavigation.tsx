@@ -1,10 +1,12 @@
-import { LayoutDashboard, Briefcase, Users, Sparkles, Bell, LogOut, FileImage } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Users, Sparkles, Bell, LogOut, FileImage, LogIn } from 'lucide-react';
 
 interface PillNavigationProps {
   activePage: string;
   onNavigate: (page: string) => void;
   userEmail: string;
   onLogout: () => void;
+  onDevLogin?: () => void;
+  isAuthenticated?: boolean;
 }
 
 const navItems = [
@@ -16,11 +18,13 @@ const navItems = [
   { id: 'ai', label: 'AI', icon: Sparkles },
 ];
 
-export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: PillNavigationProps) {
+export function PillNavigation({ activePage, onNavigate, userEmail, onLogout, onDevLogin, isAuthenticated }: PillNavigationProps) {
   const initials = userEmail
     .split('@')[0]
     .slice(0, 2)
     .toUpperCase();
+
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   return (
     <nav className="fixed top-5 left-1/2 -translate-x-1/2 z-50 w-full px-4">
@@ -51,6 +55,15 @@ export function PillNavigation({ activePage, onNavigate, userEmail, onLogout }: 
         </div>
 
         <div className="flex items-center gap-2">
+          {isDev && !isAuthenticated && onDevLogin && (
+            <button
+              onClick={onDevLogin}
+              className="neumorphic-button flex items-center gap-2 px-4 py-2 text-white text-sm font-semibold"
+            >
+              <LogIn className="w-4 h-4" />
+              Quick Login (Dev)
+            </button>
+          )}
           <button className="neumorphic-button relative p-2 text-[#e5e5e5] hover:text-white transition-colors">
             <Bell className="w-5 h-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full"></span>

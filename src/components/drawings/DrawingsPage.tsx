@@ -15,6 +15,7 @@ export function DrawingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [userId] = useState<string>('00000000-0000-0000-0000-000000000000');
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -22,32 +23,48 @@ export function DrawingsPage() {
   }, [userId]);
 
   async function loadDrawings(uid: string) {
+    console.log('[DrawingsPage] loadDrawings called for user:', uid);
     setLoading(true);
     const { data, error } = await getDrawings(uid);
+    console.log('[DrawingsPage] getDrawings result:', { data, error });
     if (data && !error) {
+      console.log('[DrawingsPage] Setting drawings, count:', data.length);
       setDrawings(data);
+    } else if (error) {
+      console.error('[DrawingsPage] Error loading drawings:', error);
     }
     setLoading(false);
   }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log('[DrawingsPage] handleFileSelect called');
     const files = Array.from(e.target.files || []);
+    console.log('[DrawingsPage] Files selected:', files.length, files.map(f => ({ name: f.name, size: f.size, type: f.type })));
     processFiles(files);
   }
 
   function processFiles(files: File[]) {
+    console.log('[DrawingsPage] processFiles called with', files.length, 'files');
     const validFiles = files.filter(file => {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/heic'];
       const maxSize = 10 * 1024 * 1024;
-      return validTypes.includes(file.type) && file.size <= maxSize;
+      const isValid = validTypes.includes(file.type) && file.size <= maxSize;
+      console.log(`[DrawingsPage] File ${file.name}: valid=${isValid}, type=${file.type}, size=${file.size}`);
+      return isValid;
     });
 
-    setSelectedFiles(prev => [...prev, ...validFiles]);
+    console.log('[DrawingsPage] Valid files:', validFiles.length);
+    setSelectedFiles(prev => {
+      const newFiles = [...prev, ...validFiles];
+      console.log('[DrawingsPage] Updated selectedFiles count:', newFiles.length);
+      return newFiles;
+    });
 
     validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrls(prev => [...prev, e.target?.result as string]);
+        console.log('[DrawingsPage] Preview URL created for:', file.name);
       };
       reader.readAsDataURL(file);
     });
@@ -110,6 +127,11 @@ export function DrawingsPage() {
     }
 
     console.log(`[DrawingsPage] Upload complete. Success: ${successCount}, Failed: ${failCount}`);
+
+    if (successCount > 0) {
+      setUploadSuccess(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}!`);
+      setTimeout(() => setUploadSuccess(null), 5000);
+    }
 
     setSelectedFiles([]);
     setPreviewUrls([]);
@@ -258,7 +280,10 @@ export function DrawingsPage() {
 
               <div className="flex gap-4">
                 <button
-                  onClick={handleUpload}
+                  onClick={() => {
+                    console.log('[DrawingsPage] Upload button clicked!');
+                    handleUpload();
+                  }}
                   disabled={uploading}
                   className="neumorphic-button px-8 py-3 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -286,6 +311,24 @@ export function DrawingsPage() {
             </div>
           )}
         </div>
+
+        {uploadSuccess && (
+          <div className="mb-6 p-4 bg-green-900/20 border-2 border-green-500 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5">✓</div>
+              <div className="flex-1">
+                <h4 className="text-green-400 font-semibold mb-1">Upload Complete</h4>
+                <p className="text-green-300 text-sm">{uploadSuccess}</p>
+              </div>
+              <button
+                onClick={() => setUploadSuccess(null)}
+                className="text-green-400 hover:text-green-300"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-white mb-4">

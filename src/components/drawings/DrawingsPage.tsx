@@ -1,364 +1,391 @@
-import { useState } from 'react';
-import { Camera, Upload, Image as ImageIcon, X, RotateCw, Download, Save, Settings } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Upload, Trash2, X, Eye, Loader2 } from 'lucide-react';
+import { supabase, uploadDrawing, getDrawings, deleteDrawing, type Drawing } from '../../lib/supabase';
 
 export function DrawingsPage() {
-  const [activeTab, setActiveTab] = useState<'upload' | 'manual'>('upload');
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationStep, setGenerationStep] = useState(0);
-  const [showOutput, setShowOutput] = useState(false);
-  const [buildingDescription, setBuildingDescription] = useState('');
-  const [dimensions, setDimensions] = useState({ height: '', width: '', length: '' });
-  const [buildingType, setBuildingType] = useState('residential');
+  const [drawings, setDrawings] = useState<Drawing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [viewingImage, setViewingImage] = useState<Drawing | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const generationSteps = [
-    'Analyzing image...',
-    'Calculating dimensions...',
-    'Generating design...'
-  ];
+  useEffect(() => {
+    checkUserAndLoadDrawings();
+  }, []);
 
-  const mockMaterialList = [
-    { item: 'Standards (2m)', quantity: 50, unit: 'pieces' },
-    { item: 'Ledgers (2.5m)', quantity: 40, unit: 'pieces' },
-    { item: 'Boards', quantity: 30, unit: 'pieces' },
-    { item: 'Base plates', quantity: 20, unit: 'pieces' },
-    { item: 'Couplers', quantity: 120, unit: 'pieces' },
-    { item: 'Guard rails', quantity: 35, unit: 'pieces' },
-  ];
+  async function checkUserAndLoadDrawings() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUserId(user.id);
+      await loadDrawings(user.id);
+    } else {
+      setLoading(false);
+    }
+  }
 
-  const totalWeight = 2450;
+  async function loadDrawings(uid: string) {
+    setLoading(true);
+    const { data, error } = await getDrawings(uid);
+    if (data && !error) {
+      setDrawings(data);
+    }
+    setLoading(false);
+  }
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+    processFiles(files);
+  }
+
+  function processFiles(files: File[]) {
+    const validFiles = files.filter(file => {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/heic'];
+      const maxSize = 10 * 1024 * 1024;
+      return validTypes.includes(file.type) && file.size <= maxSize;
+    });
+
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+
+    validFiles.forEach(file => {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        setUploadedImage(event.target?.result as string);
+      reader.onload = (e) => {
+        setPreviewUrls(prev => [...prev, e.target?.result as string]);
       };
       reader.readAsDataURL(file);
-    }
-  };
+    });
+  }
 
-  const handleGenerate = () => {
-    setIsGenerating(true);
-    setGenerationStep(0);
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(true);
+  }
 
-    const interval = setInterval(() => {
-      setGenerationStep((prev) => {
-        if (prev >= 2) {
-          clearInterval(interval);
-          setIsGenerating(false);
-          setShowOutput(true);
-          return prev;
-        }
-        return prev + 1;
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    processFiles(files);
+  }
+
+  function removeSelectedFile(index: number) {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleUpload() {
+    if (!userId || selectedFiles.length === 0) return;
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      const { error } = await uploadDrawing(file, userId, (progress) => {
+        setUploadProgress(((i + progress / 100) / selectedFiles.length) * 100);
       });
-    }, 1000);
-  };
 
-  const handleRemoveImage = () => {
-    setUploadedImage(null);
-  };
+      if (error) {
+        console.error('Upload error:', error);
+      }
+    }
 
-  const handleDownload = (type: string) => {
-    console.log(`Download ${type} clicked`);
-  };
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setUploading(false);
+    setUploadProgress(0);
+    await loadDrawings(userId);
+  }
+
+  async function handleDelete(drawingId: string) {
+    if (!userId) return;
+
+    setDeletingId(drawingId);
+    const { error } = await deleteDrawing(drawingId, userId);
+
+    if (!error) {
+      setDrawings(prev => prev.filter(d => d.id !== drawingId));
+    }
+
+    setDeletingId(null);
+    setShowDeleteConfirm(null);
+  }
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-black pt-24 flex items-center justify-center">
+        <div className="neumorphic-card p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Authentication Required</h2>
+          <p className="text-[#e5e5e5]">Please sign in to upload and manage your drawings.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black pt-24">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">AI Scaffold Designer</h1>
-          <p className="text-[#e5e5e5]">Generate 2D/3D scaffold designs from photos or descriptions</p>
+          <h1 className="text-4xl font-bold text-white mb-2">Drawings</h1>
+          <p className="text-[#e5e5e5]">Upload and manage your construction drawings</p>
         </div>
 
         <div className="neumorphic-card p-8 mb-8">
-          <div className="flex gap-4 mb-8">
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
+              isDragging ? 'border-white bg-[#1a1a1a]' : 'border-[#2d2d2d]'
+            }`}
+          >
+            <Upload className="w-16 h-16 mx-auto mb-4 text-[#e5e5e5]" />
+            <p className="text-[#e5e5e5] mb-2 text-lg">
+              {isDragging ? 'Drop files here' : 'Drag & drop files here'}
+            </p>
+            <p className="text-[#999] mb-6">or</p>
+
             <button
-              onClick={() => setActiveTab('upload')}
-              className={`flex-1 py-3 px-6 rounded-full font-semibold transition-all ${
-                activeTab === 'upload'
-                  ? 'neumorphic-button text-white'
-                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525]'
-              }`}
+              onClick={() => fileInputRef.current?.click()}
+              className="neumorphic-button px-6 py-3 font-semibold text-white"
             >
-              Upload Photo
+              Click to Upload
             </button>
-            <button
-              onClick={() => setActiveTab('manual')}
-              className={`flex-1 py-3 px-6 rounded-full font-semibold transition-all ${
-                activeTab === 'manual'
-                  ? 'neumorphic-button text-white'
-                  : 'text-[#e5e5e5] hover:text-white hover:bg-[#252525]'
-              }`}
-            >
-              Describe Manually
-            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/heic"
+              multiple
+              className="hidden"
+              onChange={handleFileSelect}
+            />
+
+            <p className="text-[#666] text-sm mt-4">
+              Accepts JPG, PNG, HEIC (max 10MB per file)
+            </p>
           </div>
 
-          {activeTab === 'upload' ? (
-            <div>
-              <div className="border-2 border-dashed border-[#2d2d2d] rounded-lg p-12 text-center mb-6 hover:border-[#3d3d3d] transition-colors">
-                <ImageIcon className="w-16 h-16 mx-auto mb-4 text-[#e5e5e5]" />
-                <p className="text-[#e5e5e5] mb-6">Drag photo here or click to upload</p>
+          {selectedFiles.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-white font-semibold mb-4">
+                Selected Files ({selectedFiles.length})
+              </h3>
 
-                <div className="flex flex-col gap-3 max-w-md mx-auto">
-                  <label className="neumorphic-button cursor-pointer flex items-center justify-center gap-2 py-3 px-6">
-                    <Camera className="w-5 h-5" />
-                    <span>Take Photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                    />
-                  </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+                {selectedFiles.map((file, index) => (
+                  <div key={index} className="relative neumorphic-card p-2">
+                    <button
+                      onClick={() => removeSelectedFile(index)}
+                      className="absolute -top-2 -right-2 bg-black border-2 border-[#2d2d2d] rounded-full p-1 text-white hover:text-red-400 transition-colors z-10"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
 
-                  <label className="neumorphic-button cursor-pointer flex items-center justify-center gap-2 py-3 px-6">
-                    <ImageIcon className="w-5 h-5" />
-                    <span>Choose from Gallery</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                    />
-                  </label>
+                    <div className="aspect-square rounded overflow-hidden bg-[#0d0d0d] mb-2">
+                      <img
+                        src={previewUrls[index]}
+                        alt={file.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-                  <label className="neumorphic-button cursor-pointer flex items-center justify-center gap-2 py-3 px-6">
-                    <Upload className="w-5 h-5" />
-                    <span>Upload from Computer</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={handleFileUpload}
-                    />
-                  </label>
-                </div>
+                    <p className="text-white text-xs truncate">{file.name}</p>
+                    <p className="text-[#666] text-xs">{formatFileSize(file.size)}</p>
+                  </div>
+                ))}
               </div>
 
-              {uploadedImage && (
-                <div className="neumorphic-card p-4 relative">
-                  <button
-                    onClick={handleRemoveImage}
-                    className="absolute top-6 right-6 neumorphic-button p-2 text-white hover:text-red-400 transition-colors z-10"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                  <img
-                    src={uploadedImage}
-                    alt="Uploaded building"
-                    className="max-w-full max-h-[400px] mx-auto rounded-lg"
-                  />
+              {uploading && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-white font-semibold">Uploading...</span>
+                    <span className="text-[#e5e5e5]">{Math.round(uploadProgress)}%</span>
+                  </div>
+                  <div className="w-full h-3 bg-[#0d0d0d] rounded-full overflow-hidden border border-[#2d2d2d]">
+                    <div
+                      className="h-full bg-white transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
                 </div>
               )}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <label className="block text-white font-semibold mb-2">Building Description</label>
-                <textarea
-                  value={buildingDescription}
-                  onChange={(e) => setBuildingDescription(e.target.value)}
-                  placeholder="Describe the building... e.g., 3-story brick office building, 40ft height, flat roof, street access on two sides"
-                  className="w-full h-32 bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-4 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
-                  style={{
-                    boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
-                  }}
-                />
-              </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-white font-semibold mb-2">Height (meters)</label>
-                  <input
-                    type="number"
-                    value={dimensions.height}
-                    onChange={(e) => setDimensions({ ...dimensions, height: e.target.value })}
-                    placeholder="0"
-                    className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
-                    style={{
-                      boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-white font-semibold mb-2">Width (meters)</label>
-                  <input
-                    type="number"
-                    value={dimensions.width}
-                    onChange={(e) => setDimensions({ ...dimensions, width: e.target.value })}
-                    placeholder="0"
-                    className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
-                    style={{
-                      boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-white font-semibold mb-2">Length (meters)</label>
-                  <input
-                    type="number"
-                    value={dimensions.length}
-                    onChange={(e) => setDimensions({ ...dimensions, length: e.target.value })}
-                    placeholder="0"
-                    className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white placeholder-[#666] focus:outline-none focus:border-[#3d3d3d]"
-                    style={{
-                      boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-white font-semibold mb-2">Building Type</label>
-                <select
-                  value={buildingType}
-                  onChange={(e) => setBuildingType(e.target.value)}
-                  className="w-full bg-[#0d0d0d] border border-[#2d2d2d] rounded-lg p-3 text-white focus:outline-none focus:border-[#3d3d3d]"
-                  style={{
-                    boxShadow: 'inset 4px 4px 8px rgba(0, 0, 0, 0.5), inset -4px -4px 8px rgba(40, 40, 40, 0.1)'
-                  }}
+              <div className="flex gap-4">
+                <button
+                  onClick={handleUpload}
+                  disabled={uploading}
+                  className="neumorphic-button px-8 py-3 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="residential">Residential</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="industrial">Industrial</option>
-                  <option value="highrise">High-rise</option>
-                </select>
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin inline-block mr-2" />
+                      Uploading...
+                    </>
+                  ) : (
+                    `Upload ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}`
+                  )}
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedFiles([]);
+                    setPreviewUrls([]);
+                  }}
+                  disabled={uploading}
+                  className="neumorphic-button px-6 py-3 font-semibold text-[#e5e5e5] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear All
+                </button>
               </div>
             </div>
           )}
         </div>
 
-        <div className="text-center mb-8">
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="neumorphic-button px-12 py-4 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background: isGenerating ? undefined : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: isGenerating ? undefined : 'text',
-              WebkitTextFillColor: isGenerating ? undefined : 'transparent',
-              backgroundClip: isGenerating ? undefined : 'text'
-            }}
-          >
-            {isGenerating ? 'Generating...' : 'Generate 2D/3D Scaffold Design'}
-          </button>
-
-          {isGenerating && (
-            <div className="mt-6">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 border-4 border-[#2d2d2d] border-t-white rounded-full animate-spin"></div>
-              </div>
-              <p className="text-white font-semibold">{generationSteps[generationStep]}</p>
-            </div>
-          )}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Your Drawings ({drawings.length})
+          </h2>
         </div>
 
-        {showOutput && (
-          <div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-              <div className="neumorphic-card p-6">
-                <h3 className="text-white font-bold text-lg mb-4">2D Elevation View</h3>
-                <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#2d2d2d]">
-                  <svg viewBox="0 0 300 200" className="w-full h-full p-4">
-                    <rect x="50" y="20" width="200" height="160" fill="none" stroke="#667eea" strokeWidth="2" />
-                    <line x1="50" y1="60" x2="250" y2="60" stroke="#667eea" strokeWidth="1" />
-                    <line x1="50" y1="100" x2="250" y2="100" stroke="#667eea" strokeWidth="1" />
-                    <line x1="50" y1="140" x2="250" y2="140" stroke="#667eea" strokeWidth="1" />
-                    <line x1="90" y1="20" x2="90" y2="180" stroke="#667eea" strokeWidth="1" />
-                    <line x1="130" y1="20" x2="130" y2="180" stroke="#667eea" strokeWidth="1" />
-                    <line x1="170" y1="20" x2="170" y2="180" stroke="#667eea" strokeWidth="1" />
-                    <line x1="210" y1="20" x2="210" y2="180" stroke="#667eea" strokeWidth="1" />
-                  </svg>
-                </div>
-              </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <Loader2 className="w-12 h-12 text-white animate-spin" />
+          </div>
+        ) : drawings.length === 0 ? (
+          <div className="neumorphic-card p-12 text-center">
+            <Upload className="w-16 h-16 mx-auto mb-4 text-[#666]" />
+            <p className="text-[#999] text-lg">No drawings uploaded yet</p>
+            <p className="text-[#666] text-sm mt-2">Upload your first drawing to get started</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {drawings.map((drawing) => (
+              <div key={drawing.id} className="neumorphic-card p-4 group">
+                <div className="aspect-video rounded overflow-hidden bg-[#0d0d0d] mb-4 relative">
+                  <img
+                    src={drawing.file_url}
+                    alt={drawing.file_name}
+                    className="w-full h-full object-cover"
+                  />
 
-              <div className="neumorphic-card p-6">
-                <h3 className="text-white font-bold text-lg mb-4">3D Interactive Model</h3>
-                <div className="bg-[#0d0d0d] rounded-lg aspect-[3/2] flex items-center justify-center border border-[#2d2d2d] relative">
-                  <div className="text-center">
-                    <div className="w-32 h-32 mx-auto mb-4 perspective-1000">
-                      <div className="w-full h-full relative preserve-3d animate-[spin_8s_linear_infinite]">
-                        <div className="absolute inset-0 border-2 border-[#667eea] bg-[#667eea]/10"></div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 justify-center">
-                      <button className="neumorphic-button p-2 text-[#e5e5e5] hover:text-white">
-                        <RotateCw className="w-4 h-4" />
-                      </button>
-                      <button className="neumorphic-button p-2 text-[#e5e5e5] hover:text-white">
-                        <Settings className="w-4 h-4" />
-                      </button>
-                    </div>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => setViewingImage(drawing)}
+                      className="neumorphic-button p-3 text-white"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+
+                    <button
+                      onClick={() => setShowDeleteConfirm(drawing.id)}
+                      className="neumorphic-button p-3 text-white hover:text-red-400 transition-colors"
+                      disabled={deletingId === drawing.id}
+                    >
+                      {deletingId === drawing.id ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              <div className="neumorphic-card p-6">
-                <h3 className="text-white font-bold text-lg mb-4">Material List</h3>
-                <div className="space-y-3">
-                  {mockMaterialList.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center pb-2 border-b border-[#2d2d2d]">
-                      <div>
-                        <p className="text-white font-semibold text-sm">{item.item}</p>
-                        <p className="text-[#999] text-xs">{item.unit}</p>
-                      </div>
-                      <span className="text-white font-bold">{item.quantity}</span>
-                    </div>
-                  ))}
-                  <div className="pt-2 mt-2 border-t-2 border-[#2d2d2d]">
-                    <div className="flex justify-between items-center">
-                      <span className="text-white font-bold">Total Weight</span>
-                      <span className="text-white font-bold">{totalWeight} kg</span>
-                    </div>
-                  </div>
+                <h3 className="text-white font-semibold truncate mb-1">
+                  {drawing.file_name}
+                </h3>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-[#999]">{formatDate(drawing.created_at)}</span>
+                  <span className="text-[#666]">{formatFileSize(drawing.file_size)}</span>
                 </div>
               </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4 justify-center">
-              <button
-                onClick={() => handleDownload('2D')}
-                className="neumorphic-button flex items-center gap-2 px-6 py-3"
-              >
-                <Download className="w-5 h-5" />
-                Download 2D Drawing
-              </button>
-              <button
-                onClick={() => handleDownload('3D')}
-                className="neumorphic-button flex items-center gap-2 px-6 py-3"
-              >
-                <Download className="w-5 h-5" />
-                Download 3D Model
-              </button>
-              <button
-                onClick={() => handleDownload('materials')}
-                className="neumorphic-button flex items-center gap-2 px-6 py-3"
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}
-              >
-                <Save className="w-5 h-5" style={{ WebkitTextFillColor: 'white' }} />
-                <span>Save to Job</span>
-              </button>
-              <button
-                onClick={() => setShowOutput(false)}
-                className="neumorphic-button flex items-center gap-2 px-6 py-3 border border-[#2d2d2d]"
-              >
-                <Settings className="w-5 h-5" />
-                Adjust Design
-              </button>
-            </div>
+            ))}
           </div>
         )}
       </div>
+
+      {viewingImage && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setViewingImage(null)}
+        >
+          <button
+            onClick={() => setViewingImage(null)}
+            className="absolute top-6 right-6 neumorphic-button p-3 text-white"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <img
+            src={viewingImage.file_url}
+            alt={viewingImage.file_name}
+            className="max-w-full max-h-full object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="neumorphic-card p-8 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-2xl font-bold text-white mb-4">Delete Drawing?</h3>
+            <p className="text-[#e5e5e5] mb-6">
+              Are you sure you want to delete this drawing? This action cannot be undone.
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => handleDelete(showDeleteConfirm)}
+                disabled={deletingId === showDeleteConfirm}
+                className="flex-1 neumorphic-button px-6 py-3 font-semibold text-red-400 border border-[#2d2d2d] disabled:opacity-50"
+              >
+                {deletingId === showDeleteConfirm ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin inline-block mr-2" />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                disabled={deletingId === showDeleteConfirm}
+                className="flex-1 neumorphic-button px-6 py-3 font-semibold text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Upload, Trash2, X, Eye, Loader2 } from 'lucide-react';
-import { supabase, uploadDrawing, getDrawings, deleteDrawing, type Drawing } from '../../lib/supabase';
+import { uploadDrawing, getDrawings, deleteDrawing, type Drawing } from '../../lib/supabase';
 
 export function DrawingsPage() {
   const [drawings, setDrawings] = useState<Drawing[]>([]);
@@ -13,22 +13,12 @@ export function DrawingsPage() {
   const [viewingImage, setViewingImage] = useState<Drawing | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId] = useState<string>('00000000-0000-0000-0000-000000000000');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    checkUserAndLoadDrawings();
-  }, []);
-
-  async function checkUserAndLoadDrawings() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      setUserId(user.id);
-      await loadDrawings(user.id);
-    } else {
-      setLoading(false);
-    }
-  }
+    loadDrawings(userId);
+  }, [userId]);
 
   async function loadDrawings(uid: string) {
     setLoading(true);
@@ -135,17 +125,6 @@ export function DrawingsPage() {
       day: 'numeric',
       year: 'numeric'
     });
-  }
-
-  if (!userId) {
-    return (
-      <div className="min-h-screen bg-black pt-24 flex items-center justify-center">
-        <div className="neumorphic-card p-8 max-w-md text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Authentication Required</h2>
-          <p className="text-[#e5e5e5]">Please sign in to upload and manage your drawings.</p>
-        </div>
-      </div>
-    );
   }
 
   return (

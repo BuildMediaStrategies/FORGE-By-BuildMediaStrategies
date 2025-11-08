@@ -1,15 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Trash2, X, Eye, Loader2 } from 'lucide-react';
-import { uploadDrawing, getDrawings, deleteDrawing, type Drawing } from '../../lib/supabase';
+import { Upload, Trash2, X, Eye, Loader2, RefreshCw } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+
+interface Drawing {
+  id: string;
+  user_id: string;
+  job_id: string | null;
+  file_url: string;
+  file_name: string;
+  file_size: number;
+  created_at: string;
+}
 
 export function DrawingsPage() {
   const [drawings, setDrawings] = useState<Drawing[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
   const [viewingImage, setViewingImage] = useState<Drawing | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -19,72 +27,43 @@ export function DrawingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    loadDrawings(userId);
-  }, [userId]);
+    fetchDrawings();
+  }, []);
 
-  async function loadDrawings(uid: string) {
-    console.log('[DrawingsPage] loadDrawings called for user:', uid);
+  async function fetchDrawings() {
     setLoading(true);
-    const { data, error } = await getDrawings(uid);
-    console.log('[DrawingsPage] getDrawings result:', { data, error });
-    if (data && !error) {
-      console.log('[DrawingsPage] Setting drawings, count:', data.length);
-      setDrawings(data);
-    } else if (error) {
-      console.error('[DrawingsPage] Error loading drawings:', error);
+    try {
+      const { data, error } = await supabase
+        .from('drawings')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setDrawings(data || []);
+    } catch (error: any) {
+      console.error('Error fetching drawings:', error);
     }
     setLoading(false);
   }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log('[DrawingsPage] handleFileSelect called');
     const files = Array.from(e.target.files || []);
-    console.log('[DrawingsPage] Files selected:', files.length, files.map(f => ({ name: f.name, size: f.size, type: f.type })));
-    processFiles(files);
-  }
-
-  function processFiles(files: File[]) {
-    console.log('[DrawingsPage] processFiles called with', files.length, 'files');
     const validFiles = files.filter(file => {
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/heic'];
       const maxSize = 10 * 1024 * 1024;
-      const isValid = validTypes.includes(file.type) && file.size <= maxSize;
-      console.log(`[DrawingsPage] File ${file.name}: valid=${isValid}, type=${file.type}, size=${file.size}`);
-      return isValid;
+      return validTypes.includes(file.type) && file.size <= maxSize;
     });
 
-    console.log('[DrawingsPage] Valid files:', validFiles.length);
-    setSelectedFiles(prev => {
-      const newFiles = [...prev, ...validFiles];
-      console.log('[DrawingsPage] Updated selectedFiles count:', newFiles.length);
-      return newFiles;
-    });
+    setSelectedFiles(validFiles);
 
     validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrls(prev => [...prev, e.target?.result as string]);
-        console.log('[DrawingsPage] Preview URL created for:', file.name);
       };
       reader.readAsDataURL(file);
     });
-  }
-
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragging(true);
-  }
-
-  function handleDragLeave(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragging(false);
-  }
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files);
-    processFiles(files);
   }
 
   function removeSelectedFile(index: number) {
@@ -93,40 +72,48 @@ export function DrawingsPage() {
   }
 
   async function handleUpload() {
-    if (!userId || selectedFiles.length === 0) {
-      console.log('[DrawingsPage] Cannot upload: userId or selectedFiles missing', { userId, filesCount: selectedFiles.length });
-      return;
-    }
+    if (selectedFiles.length === 0) return;
 
-    console.log('[DrawingsPage] Starting upload process for', selectedFiles.length, 'files');
     setUploading(true);
-    setUploadProgress(0);
     setUploadError(null);
+    setUploadSuccess(null);
 
     let successCount = 0;
-    let failCount = 0;
 
-    for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      console.log(`[DrawingsPage] Uploading file ${i + 1}/${selectedFiles.length}:`, file.name);
+    for (const file of selectedFiles) {
+      try {
+        const filePath = `${userId}/${Date.now()}-${file.name}`;
 
-      const { data, error } = await uploadDrawing(file, userId, (progress) => {
-        const overallProgress = ((i + progress / 100) / selectedFiles.length) * 100;
-        console.log(`[DrawingsPage] Progress: ${overallProgress.toFixed(1)}%`);
-        setUploadProgress(overallProgress);
-      });
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('drawings')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-      if (error) {
-        console.error(`[DrawingsPage] Failed to upload ${file.name}:`, error);
-        setUploadError(`Failed to upload ${file.name}: ${error.message}`);
-        failCount++;
-      } else {
-        console.log(`[DrawingsPage] Successfully uploaded ${file.name}:`, data);
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('drawings')
+          .getPublicUrl(uploadData.path);
+
+        const { error: dbError } = await supabase
+          .from('drawings')
+          .insert({
+            user_id: userId,
+            file_url: publicUrl,
+            file_name: file.name,
+            file_size: file.size,
+          });
+
+        if (dbError) throw dbError;
+
         successCount++;
+      } catch (error: any) {
+        console.error('Upload error:', error);
+        setUploadError(`Failed to upload ${file.name}: ${error.message}`);
       }
     }
-
-    console.log(`[DrawingsPage] Upload complete. Success: ${successCount}, Failed: ${failCount}`);
 
     if (successCount > 0) {
       setUploadSuccess(`Successfully uploaded ${successCount} file${successCount > 1 ? 's' : ''}!`);
@@ -136,20 +123,32 @@ export function DrawingsPage() {
     setSelectedFiles([]);
     setPreviewUrls([]);
     setUploading(false);
-    setUploadProgress(0);
 
-    console.log('[DrawingsPage] Reloading drawings...');
-    await loadDrawings(userId);
+    await fetchDrawings();
   }
 
   async function handleDelete(drawingId: string) {
-    if (!userId) return;
-
     setDeletingId(drawingId);
-    const { error } = await deleteDrawing(drawingId, userId);
 
-    if (!error) {
+    try {
+      const drawing = drawings.find(d => d.id === drawingId);
+      if (!drawing) return;
+
+      const urlParts = drawing.file_url.split('/');
+      const filePath = `${userId}/${urlParts[urlParts.length - 1]}`;
+
+      await supabase.storage.from('drawings').remove([filePath]);
+
+      const { error } = await supabase
+        .from('drawings')
+        .delete()
+        .eq('id', drawingId);
+
+      if (error) throw error;
+
       setDrawings(prev => prev.filter(d => d.id !== drawingId));
+    } catch (error: any) {
+      console.error('Delete error:', error);
     }
 
     setDeletingId(null);
@@ -174,23 +173,25 @@ export function DrawingsPage() {
   return (
     <div className="min-h-screen bg-black pt-24">
       <div className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Drawings</h1>
-          <p className="text-[#e5e5e5]">Upload and manage your construction drawings</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Drawings</h1>
+            <p className="text-[#e5e5e5]">Upload and manage your construction drawings</p>
+          </div>
+          <button
+            onClick={fetchDrawings}
+            disabled={loading}
+            className="neumorphic-button px-4 py-2 font-semibold text-white disabled:opacity-50"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
         <div className="neumorphic-card p-8 mb-8">
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-              isDragging ? 'border-white bg-[#1a1a1a]' : 'border-[#2d2d2d]'
-            }`}
-          >
+          <div className="border-2 border-dashed rounded-lg p-12 text-center border-[#2d2d2d]">
             <Upload className="w-16 h-16 mx-auto mb-4 text-[#e5e5e5]" />
             <p className="text-[#e5e5e5] mb-2 text-lg">
-              {isDragging ? 'Drop files here' : 'Drag & drop files here'}
+              Drag & drop files here
             </p>
             <p className="text-[#999] mb-6">or</p>
 
@@ -263,27 +264,9 @@ export function DrawingsPage() {
                 </div>
               )}
 
-              {uploading && (
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-white font-semibold">Uploading...</span>
-                    <span className="text-[#e5e5e5]">{Math.round(uploadProgress)}%</span>
-                  </div>
-                  <div className="w-full h-3 bg-[#0d0d0d] rounded-full overflow-hidden border border-[#2d2d2d]">
-                    <div
-                      className="h-full bg-white transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className="flex gap-4">
                 <button
-                  onClick={() => {
-                    console.log('[DrawingsPage] Upload button clicked!');
-                    handleUpload();
-                  }}
+                  onClick={handleUpload}
                   disabled={uploading}
                   className="neumorphic-button px-8 py-3 font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
